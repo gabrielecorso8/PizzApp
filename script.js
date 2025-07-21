@@ -30,6 +30,7 @@ function initMenu() {
 // Generate time slots
 function generateTimeSlots(incrementMinutes, elementId) {
     const select = document.getElementById(elementId);
+    if (!select) return; // Guard clause for null element
     const now = new Date();
     const startTime = new Date(now.getTime() + 30 * 60 * 1000); // Start 30 min from now
     const endTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // Next 24 hours
@@ -55,6 +56,7 @@ function updateCart() {
     const cartItems = document.getElementById('cart-items');
     const cartCount = document.getElementById('cart-count');
     const cartTotal = document.getElementById('cart-total');
+    if (!cartItems || !cartCount || !cartTotal) return; // Guard clause
     cartItems.innerHTML = '';
     let total = 0;
 
@@ -63,7 +65,7 @@ function updateCart() {
         total += item.price;
     });
 
-    if (document.getElementById('priority').checked) {
+    if (document.getElementById('priority')?.checked) {
         total += 0.5;
     }
 
@@ -74,8 +76,10 @@ function updateCart() {
 // Show specific section
 function showSection(sectionId) {
     document.querySelectorAll('section').forEach(section => section.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-    document.getElementById('cart').style.display = 'none';
+    const section = document.getElementById(sectionId);
+    if (section) section.classList.add('active');
+    const cartSection = document.getElementById('cart');
+    if (cartSection) cartSection.style.display = 'none';
     if (sectionId === 'takeaway') {
         generateTimeSlots(5, 'pickup-slot');
     } else if (sectionId === 'delivery') {
@@ -85,18 +89,22 @@ function showSection(sectionId) {
 
 // Show cart
 function showCart() {
-    document.getElementById('cart').style.display = 'flex';
-    updateCart();
+    const cartSection = document.getElementById('cart');
+    if (cartSection) {
+        cartSection.style.display = 'flex';
+        updateCart();
+    }
 }
 
 // Close cart
 function closeCart() {
-    document.getElementById('cart').style.display = 'none';
+    const cartSection = document.getElementById('cart');
+    if (cartSection) cartSection.style.display = 'none';
 }
 
 // Check delivery availability (placeholder)
 function checkDeliveryAvailability() {
-    const address = document.getElementById('delivery-address').value;
+    const address = document.getElementById('delivery-address')?.value;
     if (!address) {
         alert('Please enter a delivery address');
         return;
@@ -119,8 +127,8 @@ function fetchDeliveryAvailability(address) {
 
 // Place order
 function placeOrder() {
-    const isTakeaway = document.getElementById('takeaway').classList.contains('active');
-    const timeSlot = isTakeaway ? document.getElementById('pickup-slot').value : document.getElementById('delivery-slot').value;
+    const isTakeaway = document.getElementById('takeaway')?.classList.contains('active');
+    const timeSlot = isTakeaway ? document.getElementById('pickup-slot')?.value : document.getElementById('delivery-slot')?.value;
     
     if (cart.length === 0) {
         alert('Your cart is empty!');
@@ -139,10 +147,65 @@ function placeOrder() {
     }
 
     // Simulate API call to place order
-    fetchOrders(cart, timeSlot, document.getElementById('priority').checked).then(() => {
-        document.getElementById('confirmation-message').textContent = 
-            `Il tuo ordine sarà pronto per il ${isTakeaway ? 'ritiro' : 'consegna'} alle ${timeSlot}. Riceverai un SMS quando è pronto!`;
-        document.getElementById('confirmation').style.display = 'flex';
+    fetchOrders(cart, timeSlot, document.getElementById('priority')?.checked).then(() => {
+        const confirmationMessage = document.getElementById('confirmation-message');
+        if (confirmationMessage) {
+            confirmationMessage.textContent = 
+                `Il tuo ordine sarà pronto per il ${isTakeaway ? 'ritiro' : 'consegna'} alle ${timeSlot}. Riceverai un SMS quando è pronto!`;
+        }
+        const confirmationSection = document.getElementById('confirmation');
+        if (confirmationSection) confirmationSection.style.display = 'flex';
         cart = [];
         updateCart();
-        generateTimeSlots(is
+        generateTimeSlots(isTakeaway ? 5 : 15, isTakeaway ? 'pickup-slot' : 'delivery-slot');
+    });
+}
+
+// Placeholder for order API
+function fetchOrders(cart, timeSlot, priority) {
+    // Simulate API call
+    return Promise.resolve();
+}
+
+// Book table
+function bookTable() {
+    const date = document.getElementById('booking-date')?.value;
+    const time = document.getElementById('booking-time')?.value;
+    const guests = document.getElementById('guests')?.value;
+
+    if (!date || !time || !guests) {
+        const status = document.getElementById('booking-status');
+        if (status) status.textContent = 'Please fill all fields';
+        return;
+    }
+
+    // Simulate API call to check table availability
+    fetchTableAvailability(date, time, guests).then(isAvailable => {
+        const status = document.getElementById('booking-status');
+        if (status) {
+            status.textContent = isAvailable 
+                ? `Table booked for ${guests} on ${date} at ${time}!`
+                : 'Sorry, no tables available for the selected time.';
+        }
+    });
+}
+
+// Placeholder for table booking API
+function fetchTableAvailability(date, time, guests) {
+    // Simulate API call
+    return Promise.resolve(Math.random() > 0.3); // 70% chance of being available
+}
+
+// Close confirmation modal
+function closeConfirmation() {
+    const confirmationSection = document.getElementById('confirmation');
+    if (confirmationSection) confirmationSection.style.display = 'none';
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    initMenu();
+    generateTimeSlots(5, 'pickup-slot');
+    const priorityCheckbox = document.getElementById('priority');
+    if (priorityCheckbox) priorityCheckbox.addEventListener('change', updateCart);
+});
