@@ -14,71 +14,69 @@
             <button onclick="showSection('takeaway')">Takeaway</button>
             <button onclick="showSection('delivery')">Delivery</button>
             <button onclick="showSection('booking')">Table Booking</button>
+            <button onclick="showCart()">Cart (<span id="cart-count">0</span>)</button>
         </nav>
     </header>
-
     <main>
         <!-- Takeaway Section -->
-        <section id="takeaway" class="section active">
+        <section id="takeaway" class="active">
             <h2>Takeaway Menu</h2>
-            <div class="menu">
-                <!-- Menu items populated by JS -->
-            </div>
-            <div class="cart">
-                <h3>Your Cart</h3>
-                <div id="cart-items"></div>
-                <div id="cart-total">Total: €0.00</div>
-                <label><input type="checkbox" id="priority"> Add Priority (+€0.50)</label>
-                <div class="time-picker">
-                    <h4>Select Pickup Time</h4>
-                    <select id="pickup-time"></select>
-                </div>
-                <button onclick="placeOrder('takeaway')">Pay Online</button>
+            <div id="menu" class="menu-grid"></div>
+            <div id="pickup-time" class="time-picker">
+                <h3>Select Pickup Time</h3>
+                <select id="pickup-slot"></select>
             </div>
         </section>
 
         <!-- Delivery Section -->
-        <section id="delivery" class="section">
+        <section id="delivery">
             <h2>Delivery Menu</h2>
-            <div class="menu">
-                <!-- Menu items populated by JS -->
+            <div class="address-input">
+                <input type="text" id="delivery-address" placeholder="Enter delivery address">
+                <button onclick="checkDeliveryAvailability()">Check Availability</button>
             </div>
-            <div class="cart">
-                <h3>Your Cart</h3>
-                <div id="delivery-cart-items"></div>
-                <div id="delivery-cart-total">Total: €0.00</div>
-                <div class="address-input">
-                    <h4>Delivery Address</h4>
-                    <input type="text" id="delivery-address" placeholder="Enter your address">
-                </div>
-                <div class="time-picker">
-                    <h4>Select Delivery Time</h4>
-                    <select id="delivery-time"></select>
-                </div>
-                <button onclick="placeOrder('delivery')">Pay Online</button>
+            <div id="menu-delivery" class="menu-grid"></div>
+            <div id="delivery-time" class="time-picker">
+                <h3>Select Delivery Time</h3>
+                <select id="delivery-slot"></select>
             </div>
         </section>
 
         <!-- Table Booking Section -->
-        <section id="booking" class="section">
+        <section id="booking">
             <h2>Book a Table</h2>
             <div class="booking-form">
-                <label>Date: <input type="date" id="booking-date"></label>
-                <label>Time: <input type="time" id="booking-time" step="900"></label>
-                <label>Guests: <input type="number" id="guests" min="1" max="10"></label>
+                <input type="date" id="booking-date" min="2025-07-21">
+                <input type="time" id="booking-time" step="900">
+                <input type="number" id="guests" min="1" max="10" placeholder="Number of Guests">
                 <button onclick="bookTable()">Book Now</button>
+                <p id="booking-status"></p>
+            </div>
+        </section>
+
+        <!-- Cart Section -->
+        <section id="cart" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeCart()">&times;</span>
+                <h2>Your Cart</h2>
+                <div id="cart-items"></div>
+                <div class="cart-options">
+                    <label><input type="checkbox" id="priority"> Add Priority (+€0.50)</label>
+                    <p>Total: €<span id="cart-total">0.00</span></p>
+                </div>
+                <button onclick="placeOrder()">Pay Online</button>
             </div>
         </section>
 
         <!-- Confirmation Modal -->
-        <div id="modal" class="modal">
+        <section id="confirmation" class="modal">
             <div class="modal-content">
-                <span class="close" onclick="closeModal()">&times;</span>
-                <p id="modal-message"></p>
+                <span class="close" onclick="closeConfirmation()">&times;</span>
+                <h2>Order Confirmed</h2>
+                <p id="confirmation-message"></p>
             </div>
-        </div>
+        </section>
     </main>
-
     <script src="script.js"></script>
 </body>
 </html>
